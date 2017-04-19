@@ -1,5 +1,7 @@
 package com.xunman.animatordemo;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
@@ -20,10 +22,10 @@ public class MainActivity extends AppCompatActivity {
      * 位移动画  Anima
      */
     private void move() {
-      /* //1, 最传统的向右移动动画
-        TranslateAnimation animation = new TranslateAnimation(0, 800, 0, 0);
-        animation.setDuration(5000);
-        animation.setFillAfter(true);//移动完了停留在原地
+    /*  //1, 最传统的向右移动动画
+        TranslateAnimation animation = new TranslateAnimation(0, 300, 0, 0);
+        animation.setDuration(1000);
+//        animation.setFillAfter(true);//移动完了停留在原地
         ImageView imageView = (ImageView) findViewById(R.id.img);
         imageView.startAnimation(animation);*/
 
@@ -46,15 +48,25 @@ public class MainActivity extends AppCompatActivity {
         PropertyValuesHolder p3 = PropertyValuesHolder.ofFloat("translationY",0f,300f);
         ObjectAnimator.ofPropertyValuesHolder(imageView,p1,p2,p3).setDuration(1000).start();*/
 
-        //4,AnimatorSet 实现按顺序播放动画
+        //4,AnimatorSet 实现按顺序播放动画  ObjectAnimator    更精细的控制属性动画 多个动画组合到AnimatorSet中 组合成完整的动画效果
         ImageView imageView = (ImageView) findViewById(R.id.img);
-        ObjectAnimator animator1 = ObjectAnimator.ofFloat(imageView,"rotation",0f,360f);
-        ObjectAnimator animator2 = ObjectAnimator.ofFloat(imageView,"translationX",0f,300f);
-        ObjectAnimator animator3 = ObjectAnimator.ofFloat(imageView,"translationY",0f,300f);
+        ObjectAnimator animator1 = ObjectAnimator.ofFloat(imageView, "rotation", 0f, 360f);
+        ObjectAnimator animator2 = ObjectAnimator.ofFloat(imageView, "translationX", 0, 100f);
+        ObjectAnimator animator3 = ObjectAnimator.ofFloat(imageView, "translationY", 0, 100f);
         AnimatorSet set = new AnimatorSet();
-        set.playTogether(animator1,animator2,animator3);
+//        set.playTogether(animator1, animator2, animator3);//同步播放
+//        set.playSequentially(animator1, animator2, animator3);//按照先后顺序
+        set.play(animator2).with(animator3);
+        set.play(animator1).after(animator2);//以上两行是组合动画加上最后显示动画
         set.setDuration(1000);
+        set.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+            }
+        });//这个监听是需要哪个就写哪个
         set.start();
+
     }
 
     public void click(View v) {
@@ -67,4 +79,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
+
+
 }
